@@ -74,10 +74,15 @@ def write_file(model_ff, input_file, output_dir, vol_out, inmem=False, postfix='
 
     input_nib = nib.load(input_file)
     affine = input_nib.affine
-#     zoom = input_nib.header.get_zooms()
-    result = nib.Nifti1Image(vol_out.astype(input_nib.get_data_dtype()), affine)
+    zoom = input_nib.header.get_zooms()
+    
 
-#     result.header.set_zooms(zoom)
+    if postfix=='vdm':
+        result = nib.Nifti1Image(vol_out, affine)
+    else:
+        result = nib.Nifti1Image(vol_out.astype(input_nib.get_data_dtype()), affine)
+        result.header.set_zooms(zoom)
+
 
     if not inmem:
         nib.save(result, output_file)
