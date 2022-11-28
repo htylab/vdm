@@ -8,7 +8,8 @@ import tqdm
 import torch
 from UNet3d import UNet3d
 from scipy.ndimage import gaussian_filter
-from tools import *
+from lib_tool import *
+from lib_vdm import *
 import warnings
 warnings.filterwarnings("ignore")
 
@@ -16,7 +17,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('input',  type=str, nargs='+', help='Path to the input image, can be a folder for the specific format(nii.gz)')
 parser.add_argument('-o', '--output', default=None, help='File path for output image, default: the directory of input files')
 parser.add_argument('-b0', '--b0_index', default=None, type=str, help='The index of b0 slice or the .bval file, default: 0 (the first slice)')
-parser.add_argument('-m', '--fmap', action='store_true', help='Producing the virtual displacement map')
+parser.add_argument('-m', '--dmap', action='store_true', help='Producing the virtual displacement map')
 parser.add_argument('-g', '--gpu', action='store_true', help='Using GPU')
 
 args = parser.parse_args() 
@@ -85,8 +86,11 @@ for f in tqdm.tqdm(ffs):
         df_map_f[..., nslice] = df_map_slice
 
     vol_out = vol_org*0
-    for bslice in range(vol_org.shape[3] if len(vol_org.shape)==4 else 1):
-        vol_out[...,bslice] = apply_vdm_3d(vol_org[...,bslice], df_map_f, AP_RL='AP')
+    if len(vol_org.shape)==4:
+        for bslice in range(vol_org.shape[3]):
+            vol_out[...,bslice] = apply_vdm_3d(vol_org[...,bslice], df_map_f, AP_RL='AP')
+    else:
+        vol_out = apply_vdm_3d(vol_org, df_map_f, AP_RL='AP')
 
     
     if output_dir is None:
