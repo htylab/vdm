@@ -20,6 +20,7 @@ from nilearn.image import resample_img
 parser = argparse.ArgumentParser()
 parser.add_argument('input',  type=str, nargs='+', help='Path to the input image, can be a folder for the specific format(nii.gz)')
 parser.add_argument('output', help='File path for output segmentation.')
+parser.add_argument('-b0', '--b0_index', default=0, type=int, help='The index of b0 slice')
 parser.add_argument('-g', '--gpu', action='store_true', help='Using GPU')
 
 args = parser.parse_args() 
@@ -37,10 +38,19 @@ os.makedirs(result_dir, exist_ok=True)
 
 device = 'cuda' if args.gpu and torch.cuda.is_available() else 'cpu'
 
-model_path = 'VDM_model_v1.pt'
+b0_index = args.b0_index
 
+model_path = './'
+model_file = os.path.join(model_path,'vdm_model_v1.pt')
+model_url = 'https://github.com/htylab/tigervdm/releases/tag/model/vdm_model_v1.pt'
+if not os.path.exists(model_file):
+    print(f'Downloading model files....')
+    import urllib.request
+    model_file,header  = urllib.request.urlretrieve(model_url, model_file)
 
     
+    
+
 def resample_to_new_resolution(data_nii, target_resolution, target_shape=None, interpolation='continuous'):
     affine = data_nii.affine
     target_affine = affine.copy()
@@ -74,7 +84,7 @@ def apply_vdm_3d(ima, vdm, readout=1,  AP_RL='AP'):
     return new_ima*jac_np
 
 NET = UNet3d(in_channels=1, n_classes=1, n_channels=24, z_pooling=True).to(device)
-NET.load_state_dict(torch.load(model_path))
+NET.load_state_dict(torch.load(model_file))
     
 for f in tqdm.tqdm(ffs):
     
@@ -83,7 +93,7 @@ for f in tqdm.tqdm(ffs):
     zoom = temp.header.get_zooms()[0:3]
     vol_org = temp.get_fdata()
     if len(temp.shape)>3:
-        vol = vol_org.copy()[...,0]
+        vol = vol_org.copy()[...,b0_index]
     else:
         vol = vol_org.copy()
 
