@@ -2,25 +2,21 @@ import sys
 import argparse
 import glob
 import os
-from os.path import basename, join
 import numpy as np
 import nibabel as nib
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
-import SimpleITK as sitk
 import tqdm
-import warnings
+import torch
 from UNet3d import UNet3d
-warnings.filterwarnings("ignore")
-
 from scipy.ndimage import gaussian_filter
-from nilearn.image import resample_img
+from tools import *
+import warnings
+warnings.filterwarnings("ignore")
 
 parser = argparse.ArgumentParser()
 parser.add_argument('input',  type=str, nargs='+', help='Path to the input image, can be a folder for the specific format(nii.gz)')
 parser.add_argument('output', help='File path for output segmentation.')
-parser.add_argument('-b0', '--b0_index', default=0, type=int, help='The index of b0 slice')
+parser.add_argument('-b0', '--b0_index', default=None, type=str, help='The index of b0 slice or the .bval file')
+parser.add_argument('-m', '--fmap', help='Producing the aseg mask')
 parser.add_argument('-g', '--gpu', action='store_true', help='Using GPU')
 
 args = parser.parse_args() 
@@ -38,50 +34,23 @@ os.makedirs(result_dir, exist_ok=True)
 
 device = 'cuda' if args.gpu and torch.cuda.is_available() else 'cpu'
 
-b0_index = args.b0_index
+if args.b0_index is None:
+    b0_index = 0
+elif os.path.exists(args.b0_index.replace('.bval', '') + '.bval'):
+    b0_index = get_b0_slice(args.b0_index.replace('.bval', '') + '.bval')
+else:
+    b0_index = int(args.b0_index)
 
 model_path = './'
 model_file = os.path.join(model_path,'vdm_model_v1.pt')
 model_url = 'https://github.com/htylab/tigervdm/releases/tag/model/vdm_model_v1.pt'
 if not os.path.exists(model_file):
     print(f'Downloading model files....')
-    import urllib.request
-    model_file,header  = urllib.request.urlretrieve(model_url, model_file)
+    print(model_url, model_file)
+    download(model_url, model_file)
+    print('Download finished...')
 
     
-    
-
-def resample_to_new_resolution(data_nii, target_resolution, target_shape=None, interpolation='continuous'):
-    affine = data_nii.affine
-    target_affine = affine.copy()
-    factor = np.zeros(3)
-    for i in range(3):
-        factor[i] = target_resolution[i] / np.sqrt(affine[0, i]**2 + affine[1, i]**2 + affine[2, i]**2)
-        target_affine[:3, i] = target_affine[:3, i]*factor[i]
-        
-    new_nii = resample_img(data_nii, target_affine=target_affine, target_shape=target_shape, interpolation=interpolation)
-    return new_nii
-    
-def apply_vdm_3d(ima, vdm, readout=1,  AP_RL='AP'):
-    
-    if AP_RL=='AP':
-        arr = np.stack([vdm*0, vdm*readout, vdm*0], axis=-1)
-    else:
-        arr = np.stack([vdm*0, vdm*0, vdm*readout], axis=-1)
-    displacement_image = sitk.GetImageFromArray(arr, isVector=True)
-    
-    jac = sitk.DisplacementFieldJacobianDeterminant(displacement_image)
-    tx = sitk.DisplacementFieldTransform(displacement_image)
-    ref = sitk.GetImageFromArray(ima*0)
-    resampler = sitk.ResampleImageFilter()
-    resampler.SetReferenceImage(ref)
-    resampler.SetInterpolator(sitk.sitkLinear) #sitkNearestNeighbor, sitk.sitkLinear
-    resampler.SetTransform(tx)
-
-    new_ima = resampler.Execute(sitk.GetImageFromArray(ima))
-    new_ima = sitk.GetArrayFromImage(new_ima)
-    jac_np = sitk.GetArrayFromImage(jac)
-    return new_ima*jac_np
 
 NET = UNet3d(in_channels=1, n_classes=1, n_channels=24, z_pooling=True).to(device)
 NET.load_state_dict(torch.load(model_file))
@@ -96,7 +65,6 @@ for f in tqdm.tqdm(ffs):
         vol = vol_org.copy()[...,b0_index]
     else:
         vol = vol_org.copy()
-
         
     vol[vol<0] = 0
     
@@ -122,12 +90,12 @@ for f in tqdm.tqdm(ffs):
         vol_out[...,bslice] = apply_vdm_3d(vol_org[...,bslice], df_map_f, AP_RL='AP')
 
     
-    
     result = nib.Nifti1Image(vol_out.astype(temp.get_data_dtype()), affine)
-    fn = basename(f).replace('.nii.gz', '_vdmi.nii.gz')
-    nib.save(result, join(result_dir, fn))
+    fn = os.path.basename(f).replace('.nii.gz', '_vdmi.nii.gz')
+    nib.save(result, os.path.join(result_dir, fn))
     
-    result = nib.Nifti1Image(df_map, affine)
-    result.header.set_zooms(zoom)
-    fn = basename(f).replace('.nii.gz', '_vdm.nii.gz')
-    nib.save(result, join(result_dir, fn))
+    if args.fmap:
+        result = nib.Nifti1Image(df_map_f, affine)
+        result.header.set_zooms(zoom)
+        fn = os.path.basename(f).replace('.nii.gz', '_vdm.nii.gz')
+        nib.save(result, os.path.join(result_dir, fn))
