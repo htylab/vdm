@@ -14,9 +14,9 @@ warnings.filterwarnings("ignore")
 
 parser = argparse.ArgumentParser()
 parser.add_argument('input',  type=str, nargs='+', help='Path to the input image, can be a folder for the specific format(nii.gz)')
-parser.add_argument('output', help='File path for output segmentation.')
-parser.add_argument('-b0', '--b0_index', default=None, type=str, help='The index of b0 slice or the .bval file')
-parser.add_argument('-m', '--fmap', help='Producing the aseg mask')
+parser.add_argument('-o', '--output', default=None, help='File path for output image, default: the directory of input files')
+parser.add_argument('-b0', '--b0_index', default=None, type=str, help='The index of b0 slice or the .bval file, default: 0 (the first slice)')
+parser.add_argument('-m', '--fmap', action='store_true', help='Producing the aseg mask')
 parser.add_argument('-g', '--gpu', action='store_true', help='Using GPU')
 
 args = parser.parse_args() 
@@ -29,10 +29,9 @@ if os.path.isdir(args.input[0]):
 elif '*' in args.input[0]:
     ffs = glob.glob(args.input[0])
 
-result_dir = args.output
-os.makedirs(result_dir, exist_ok=True)
+output_dir = args.output
 
-device = 'cuda' if args.gpu and torch.cuda.is_available() else 'cpu'
+device = 'cuda' if (args.gpu and torch.cuda.is_available()) else 'cpu'
 
 if args.b0_index is None:
     b0_index = 0
@@ -89,6 +88,12 @@ for f in tqdm.tqdm(ffs):
     for bslice in range(vol_org.shape[3] if len(vol_org.shape)==4 else 1):
         vol_out[...,bslice] = apply_vdm_3d(vol_org[...,bslice], df_map_f, AP_RL='AP')
 
+    
+    if output_dir is None:
+        result_dir = os.path.dirname(os.path.abspath(f))
+    else:
+        result_dir = output_dir
+        os.makedirs(output_dir, exist_ok=True)
     
     result = nib.Nifti1Image(vol_out.astype(temp.get_data_dtype()), affine)
     fn = os.path.basename(f).replace('.nii.gz', '_vdmi.nii.gz')
