@@ -1,1 +1,44 @@
 # tigervdm
+#### This repo is for the methods described in the paper.
+Kuo CC, Huang TY, “OOXX” (2022), OOXX
+
+
+* This repo is the version of the paper and only for Pytorch or a stand-alone exe.
+* For updated version, please visit: https://github.com/htylab/tigerbx
+
+# The VDM pipeline for DTI distortion correction 
+
+## Background
+This package provides VDM distortion correction method for diffusion tensor images
+
+
+## Tutorial using SubBrainSegment
+
+### Download package
+
+    https://github.com/htylab/tigervdm/releases/main.zip 
+
+## Usage
+
+### As a command line tool:
+
+    cd ./tigervdm
+
+    python predict.py INPUT -o OUTPUT
+
+If INPUT points to a file, the file will be processed. If INPUT points to a directory, the directory will be searched for the specific format(nii.gz).
+OUTPUT is the output directory.
+
+For additional options type:
+
+    python predict.py -h
+
+
+
+### Exe module:
+
+    tigervdm.exe INPUT -o OUTPUT
+
+For additional options type:
+
+    tigervdm.exe -h
