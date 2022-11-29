@@ -175,27 +175,13 @@ def gernerate_vdm(vdm_mode, session, orig_data, b0_index):
 
     logits = predict(session, image)
 
-    if vdm_mode == 'gan':
-        
-        df_map = resample_to_new_resolution(nib.Nifti1Image(logits[0, 0, ...], resample_nii.affine), target_resolution=zoom, target_shape=vol.shape, interpolation='linear').get_fdata() / 1.75 * zoom[1]
+    df_map = resample_to_new_resolution(nib.Nifti1Image(logits[0, 0, ...], resample_nii.affine), target_resolution=zoom, target_shape=vol.shape, interpolation='linear').get_fdata() / 1.75 * zoom[1]
 
-        df_map_f = np.array(df_map*0, dtype='float64')
-        for nslice in np.arange(df_map.shape[2]):
-            df_map_slice = gaussian_filter(df_map[..., nslice], sigma=1.5).astype('float64')
-            df_map_f[..., nslice] = df_map_slice
-        vdm_pred = df_map_f
-
-    else: #3dunet
-
-        mask_softmax = softmax(logits[0, ...], axis=0)
-
-        softmax_all = 0
-        for ii in range(101):
-            softmax_all += mask_softmax[ii, ...] * ii
-
-        vdm_pred = gaussian_filter(softmax_all*0.4 - 20, 0.5).astype(np.float)
-        
-
+    df_map_f = np.array(df_map*0, dtype='float64')
+    for nslice in np.arange(df_map.shape[2]):
+        df_map_slice = gaussian_filter(df_map[..., nslice], sigma=1.5).astype('float64')
+        df_map_f[..., nslice] = df_map_slice
+    vdm_pred = df_map_f
 
     
 
