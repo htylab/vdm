@@ -103,7 +103,7 @@ for f in tqdm.tqdm(ffs):
     fn = os.path.basename(f).replace('.nii.gz', '_vdmi.nii.gz')
     nib.save(result, os.path.join(result_dir, fn))
     
-    if args.fmap:
+    if args.dmap:
         result = nib.Nifti1Image(df_map_f, affine)
         result.header.set_zooms(zoom)
         fn = os.path.basename(f).replace('.nii.gz', '_vdm.nii.gz')
