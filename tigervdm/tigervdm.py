@@ -18,7 +18,7 @@ def main():
 
     parser = argparse.ArgumentParser()
     parser.add_argument('input',  type=str, nargs='+', help='Path to the input image, can be a folder for the specific format(nii.gz)')
-    parser.add_argument('-o', '--output', default=None, help='File path for output segmentation, default: the directory of input files')
+    parser.add_argument('-o', '--output', default=None, help='File path for output image, default: the directory of input files')
     parser.add_argument('-b0', '--b0_index', default=None, type=str, help='The index of b0 slice or the .bval file, default: 0 (the first slice)')
     parser.add_argument('-m', '--dmap', action='store_true', help='Producing the virtual displacement map')
     parser.add_argument('-g', '--gpu', action='store_true', help='Using GPU')
@@ -56,10 +56,16 @@ def main():
         input_data = vdm.read_file(model_name, f)
         vdmi, vdmap = vdm.run(model_name, input_data, b0_index, GPU=args.gpu)
         
-        output_file, _ = vdm.write_file(model_name, f, output_dir, vdmi)
+        if output_dir is None:
+            f_output_dir = os.path.dirname(os.path.abspath(f))
+        else:
+            f_output_dir = output_dir
+            os.makedirs(output_dir, exist_ok=True)
+        
+        vdm.write_file(model_name, f, f_output_dir, vdmi)
         
         if args.dmap:
-            vdm.write_file(model_name, f, output_dir, vdmap, postfix='vdm')
+            vdm.write_file(model_name, f, f_output_dir, vdmap, postfix='vdm')
 
         print('Processing time: %d seconds' % (time.time() - t))    
 

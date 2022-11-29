@@ -194,6 +194,7 @@ def gernerate_vdm(vdm_mode, session, orig_data, b0_index):
             softmax_all += mask_softmax[ii, ...] * ii
 
         vdm_pred = gaussian_filter(softmax_all*0.4 - 20, 0.5).astype(np.float)
+        
 
 
     
