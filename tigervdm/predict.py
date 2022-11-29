@@ -43,7 +43,7 @@ else:
 
 model_path = './'
 model_file = os.path.join(model_path,'vdm_model_v1.pt')
-model_url = 'https://github.com/htylab/tigervdm/releases/tag/model/vdm_model_v1.pt'
+model_url = 'https://github.com/htylab/tigervdm/releases/download/modelhub/vdm_model_v1.pt'
 if not os.path.exists(model_file):
     print(f'Downloading model files....')
     print(model_url, model_file)
