@@ -41,7 +41,8 @@ elif os.path.exists(args.b0_index.replace('.bval', '') + '.bval'):
 else:
     b0_index = int(args.b0_index)
 
-model_path = './'
+model_path = './models'
+os.makedirs(model_path, exist_ok=True)
 model_file = os.path.join(model_path,'vdm_model_v1.pt')
 model_url = 'https://github.com/htylab/tigervdm/releases/download/modelhub/vdm_model_v1.pt'
 if not os.path.exists(model_file):
