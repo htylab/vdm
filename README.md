@@ -12,7 +12,7 @@ Kuo CC, Huang TY, “OOXX” (2022), OOXX
 This package provides VDM distortion correction method for diffusion tensor images
 
 
-## Tutorial using SubBrainSegment
+## Tutorial using VDM for EPI Distortion Correction
 
 ### Download package
 
@@ -22,14 +22,19 @@ This package provides VDM distortion correction method for diffusion tensor imag
 
 ### As a command line tool:
 
+- Clone this repository:
+
+    git clone https://github.com/htylab/tigervdm
     cd ./tigervdm
+
+- Run the predict code:
 
     python predict.py INPUT -o OUTPUT
 
 If INPUT points to a file, the file will be processed. If INPUT points to a directory, the directory will be searched for the specific format(nii.gz).
 OUTPUT is the output directory.
 
-For additional options type:
+- For additional options type:
 
     python predict.py -h
 
