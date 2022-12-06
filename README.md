@@ -23,21 +23,21 @@ This package provides VDM distortion correction method for diffusion tensor imag
 ### As a command line tool:
 
 - Clone this repository:
-
-    git clone https://github.com/htylab/tigervdm
-    cd ./tigervdm
-
+```bash
+git clone https://github.com/htylab/tigervdm
+cd ./tigervdm
+```
 - Run the predict code:
-
-    python predict.py INPUT -o OUTPUT
-
+```
+python predict.py INPUT -o OUTPUT
+```
 If INPUT points to a file, the file will be processed. If INPUT points to a directory, the directory will be searched for the specific format(nii.gz).
 OUTPUT is the output directory.
 
 - For additional options type:
-
-    python predict.py -h
-
+```
+python predict.py -h
+```
 
 
 ### Exe module:
