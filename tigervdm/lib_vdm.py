@@ -50,7 +50,7 @@ def run(model_ff, input_data, b0_index, GPU):
             
     else:
         
-        output_vol = apply_vdm_3d(vol_org, df_map_f, AP_RL='AP')
+        output_vol = apply_vdm_3d(orig_data3d, vdm_pred, AP_RL='AP')
 
     
 
@@ -100,7 +100,8 @@ def predict(model, data):
 def get_b0_slice(ff):
     with open(ff) as f:
         bvals = f.readlines()[0].replace('\n', '').split(' ')
-    return np.argmax(np.char.equal(bvals, '0'))
+    bvals = [int(bval) for bval in bvals]
+    return np.argmin(bvals)
 
     
 def resample_to_new_resolution(data_nii, target_resolution, target_shape=None, interpolation='continuous'):
@@ -115,9 +116,12 @@ def resample_to_new_resolution(data_nii, target_resolution, target_shape=None, i
     return new_nii
 
 
-def apply_vdm_2d(ima, vdm, readout=1):
+def apply_vdm_2d(ima, vdm, readout=1, AP_RL='AP'):
 
-    arr = np.stack([vdm*readout, vdm*0], axis=-1)
+    if AP_RL == 'AP':
+        arr = np.stack([vdm*readout, vdm*0], axis=-1)
+    else:
+        arr = np.stack([vdm*0, vdm*readout], axis=-1)
     displacement_image = sitk.GetImageFromArray(arr, isVector=True)
 
     jac = sitk.DisplacementFieldJacobianDeterminant(displacement_image)
@@ -135,7 +139,7 @@ def apply_vdm_2d(ima, vdm, readout=1):
     return new_ima*jac_np
 
 
-def apply_vdm_3d(ima, vdm, readout=1,  AP_RL='AP'):
+def apply_vdm_3d(ima, vdm, readout=1, AP_RL='AP'):
 
     if AP_RL == 'AP':
         arr = np.stack([vdm*0, vdm*readout, vdm*0], axis=-1)
@@ -165,7 +169,7 @@ def gernerate_vdm(vdm_mode, session, orig_data, b0_index):
     vol = orig_data.get_fdata()[...,b0_index]
     vol[vol<0] = 0
     
-    resample_nii = resample_to_new_resolution(nib.Nifti1Image(vol, orig_data.affine), target_resolution=(1.75, 1.75, 1.75), target_shape=None, interpolation='continuous')
+    resample_nii = resample_to_new_resolution(nib.Nifti1Image(vol, orig_data.affine), target_resolution=(1.7, 1.7, 1.7), target_shape=None, interpolation='continuous')
     vol_resize = resample_nii.get_fdata()
     vol_resize = vol_resize / np.max(vol_resize)
     
