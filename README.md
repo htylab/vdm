@@ -25,7 +25,7 @@ This package provides VDM distortion correction method for diffusion tensor imag
 - Clone this repository:
 ```bash
 git clone https://github.com/htylab/vdm
-cd ./vdm
+cd ./vdm/vdm
 ```
 - Run the predict code:
 ```
