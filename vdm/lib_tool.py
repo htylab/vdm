@@ -21,7 +21,7 @@ model_servers = ['https://github.com/htylab/vdm/releases/download/modelhub/',
                     'https://data.mrilab.org/onnxmodel/dev/']
 
 # determine if application is a script file or frozen exe
-if getattr(sys, 'frozen', False) and 0:
+if getattr(sys, 'frozen', False):
     application_path = os.path.dirname(sys.executable)
 elif __file__:
     application_path = os.path.dirname(os.path.abspath(__file__))
