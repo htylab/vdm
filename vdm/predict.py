@@ -17,8 +17,8 @@ parser = argparse.ArgumentParser()
 parser.add_argument('input',  type=str, nargs='+', help='Path to the input image, can be a folder for the specific format(nii.gz)')
 parser.add_argument('-o', '--output', default=None, help='File path for output image, default: the directory of input files')
 parser.add_argument('-b0', '--b0_index', default=None, type=str, help='The index of b0 slice or the .bval file, default: 0 (the first slice)')
-parser.add_argument('-m', '--dmap', action='store_true', help='Producing the virtual displacement map')
 parser.add_argument('-r', '--resample', default=True, help='Resample to 1.7, default: True')
+parser.add_argument('-m', '--dmap', action='store_true', help='Producing the virtual displacement map')
 parser.add_argument('-g', '--gpu', action='store_true', help='Using GPU')
 
 args = parser.parse_args() 
@@ -45,7 +45,7 @@ else:
 model_path = './models'
 os.makedirs(model_path, exist_ok=True)
 model_file = os.path.join(model_path,'vdm_model_v1.pt')
-model_url = 'https://github.com/htylab/tigervdm/releases/download/modelhub/vdm_model_v1.pt'
+model_url = 'https://github.com/htylab/vdm/releases/download/modelhub/vdm_model_v1.pt'
 if not os.path.exists(model_file):
     print(f'Downloading model files....')
     print(model_url, model_file)

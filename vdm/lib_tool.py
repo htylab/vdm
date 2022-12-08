@@ -17,7 +17,7 @@ import sys
 warnings.filterwarnings("ignore", category=UserWarning)
 nib.Nifti1Header.quaternion_threshold = -100
 
-model_servers = ['https://github.com/htylab/tigervdm/releases/download/modelhub/',
+model_servers = ['https://github.com/htylab/vdm/releases/download/modelhub/',
                     'https://data.mrilab.org/onnxmodel/dev/']
 
 # determine if application is a script file or frozen exe

@@ -1,6 +1,6 @@
 # tigervdm
 #### This repo is for the methods described in the paper.
-Kuo CC, Huang TY, “OOXX” (2022), OOXX
+Kuo CC, Huang TY, “Referenceless correction of EPI distortion with virtual displacement mapping” (2022), 
 
 
 * This repo is the version of the paper and only for Pytorch or a stand-alone exe.
@@ -24,8 +24,8 @@ This package provides VDM distortion correction method for diffusion tensor imag
 
 - Clone this repository:
 ```bash
-git clone https://github.com/htylab/tigervdm
-cd ./tigervdm
+git clone https://github.com/htylab/vdm
+cd ./vdm
 ```
 - Run the predict code:
 ```
