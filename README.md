@@ -16,7 +16,7 @@ This package provides VDM distortion correction method for diffusion tensor imag
 
 ### Download package
 
-    https://github.com/htylab/tigervdm/releases/main.zip 
+    https://github.com/htylab/vdm/releases/main.zip 
 
 ## Usage
 
@@ -47,8 +47,9 @@ python predict.py -h
 ```
 
 For additional options type:
-
-    .\vdm.exe -h
+```bash
+.\vdm.exe -h
+```
 
 - Linux or Mac:
 ```bash
@@ -56,5 +57,6 @@ For additional options type:
 ```
 
 For additional options type:
-
-    ./vdm -h
+```bash
+./vdm -h
+```
