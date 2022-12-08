@@ -168,7 +168,10 @@ def apply_vdm_3d(ima, vdm, readout=1, AP_RL='AP'):
 def gernerate_vdm(vdm_mode, session, orig_data, b0_index, resample=True):
 
     zoom = orig_data.header.get_zooms()[0:3]
-    vol = orig_data.get_fdata()[...,b0_index]
+    if len(orig_data.shape)>3:
+        vol = orig_data.get_fdata()[...,b0_index]
+    else:
+        vol = orig_data.get_fdata()
     vol[vol<0] = 0
     
     if resample:
