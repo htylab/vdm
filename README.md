@@ -41,9 +41,20 @@ python predict.py -h
 
 
 ### Exe module:
-
-    tigervdm.exe INPUT -o OUTPUT
+- Windows:
+```bash
+vdm.exe INPUT -o OUTPUT
+```
 
 For additional options type:
 
-    tigervdm.exe -h
+    vdm.exe -h
+
+- Linux or Mac:
+```bash
+vdm INPUT -o OUTPUT
+```
+
+For additional options type:
+
+    vdm -h
