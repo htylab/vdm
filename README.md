@@ -4,7 +4,7 @@ Kuo CC, Huang TY, “Referenceless correction of EPI distortion with virtual dis
 
 
 * This repo is the version of the paper and only for Pytorch or a stand-alone exe.
-* For updated version, please visit: https://github.com/htylab/tigerbx
+* For updated version, please visit: https://github.com/htylab/tigervdm
 
 # The VDM pipeline for DTI distortion correction 
 
