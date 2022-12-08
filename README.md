@@ -1,4 +1,4 @@
-# tigervdm
+# VDM
 #### This repo is for the methods described in the paper.
 Kuo CC, Huang TY, “Referenceless correction of EPI distortion with virtual displacement mapping” (2022), 
 
