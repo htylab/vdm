@@ -21,6 +21,7 @@ def main():
     parser.add_argument('-o', '--output', default=None, help='File path for output image, default: the directory of input files')
     parser.add_argument('-b0', '--b0_index', default=None, type=str, help='The index of b0 slice or the .bval file, default: 0 (the first slice)')
     parser.add_argument('-m', '--dmap', action='store_true', help='Producing the virtual displacement map')
+    parser.add_argument('-r', '--resample', default=True, help='Resample to 1.7, default: True')
     parser.add_argument('-g', '--gpu', action='store_true', help='Using GPU')
 
     args = parser.parse_args() 
@@ -54,7 +55,7 @@ def main():
         print('Predicting:', f)
         t = time.time()
         input_data = vdm.read_file(model_name, f)
-        vdmi, vdmap = vdm.run(model_name, input_data, b0_index, GPU=args.gpu)
+        vdmi, vdmap = vdm.run(model_name, input_data, b0_index, GPU=args.gpu, resample=args.resample)
         
         if output_dir is None:
             f_output_dir = os.path.dirname(os.path.abspath(f))

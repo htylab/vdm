@@ -43,18 +43,18 @@ python predict.py -h
 ### Exe module:
 - Windows:
 ```bash
-vdm.exe INPUT -o OUTPUT
+.\vdm.exe INPUT -o OUTPUT
 ```
 
 For additional options type:
 
-    vdm.exe -h
+    .\vdm.exe -h
 
 - Linux or Mac:
 ```bash
-vdm INPUT -o OUTPUT
+./vdm INPUT -o OUTPUT
 ```
 
 For additional options type:
 
-    vdm -h
+    ./vdm -h

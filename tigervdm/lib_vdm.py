@@ -5,7 +5,7 @@ import SimpleITK as sitk
 from os.path import join, basename, isdir
 import numpy as np
 import nibabel as nib
-import onnxruntime as ort
+# import onnxruntime as ort
 from scipy.special import softmax
 from nilearn.image import resample_img
 
@@ -18,8 +18,9 @@ def get_mode(model_ff):
 
     return seg_mode, version, model_str
 
-def run(model_ff, input_data, b0_index, GPU):
-
+def run(model_ff, input_data, b0_index, GPU, resample=True):
+    import onnxruntime as ort
+    
     so = ort.SessionOptions()
     so.intra_op_num_threads = 4
     so.inter_op_num_threads = 4
@@ -39,7 +40,7 @@ def run(model_ff, input_data, b0_index, GPU):
     orig_data = input_data  
     
     
-    vdm_pred = gernerate_vdm(vdm_mode, session, orig_data, b0_index)
+    vdm_pred = gernerate_vdm(vdm_mode, session, orig_data, b0_index, resample=resample)
 
     output_vol = np.zeros(orig_data.shape)
     orig_data3d = orig_data.get_fdata()
@@ -91,6 +92,7 @@ def write_file(model_ff, input_file, output_dir, vol_out, inmem=False, postfix='
 
 
 def predict(model, data):
+    import onnxruntime as ort
     if model.get_inputs()[0].type == 'tensor(float)':
         return model.run(None, {model.get_inputs()[0].name: data.astype('float32')}, )[0]
     else:
@@ -163,15 +165,18 @@ def apply_vdm_3d(ima, vdm, readout=1, AP_RL='AP'):
 
 
 
-def gernerate_vdm(vdm_mode, session, orig_data, b0_index):
+def gernerate_vdm(vdm_mode, session, orig_data, b0_index, resample=True):
 
     zoom = orig_data.header.get_zooms()[0:3]
     vol = orig_data.get_fdata()[...,b0_index]
     vol[vol<0] = 0
     
-    resample_nii = resample_to_new_resolution(nib.Nifti1Image(vol, orig_data.affine), target_resolution=(1.7, 1.7, 1.7), target_shape=None, interpolation='continuous')
-    vol_resize = resample_nii.get_fdata()
-    vol_resize = vol_resize / np.max(vol_resize)
+    if resample:
+        resample_nii = resample_to_new_resolution(nib.Nifti1Image(vol, orig_data.affine), target_resolution=(1.7, 1.7, 1.7), target_shape=None, interpolation='continuous')
+        vol_resize = resample_nii.get_fdata()
+        vol_resize = vol_resize / np.max(vol_resize)
+    else:
+        vol_resize = vol / np.max(vol)
     
     image = vol_resize[None, ...][None, ...]
 
@@ -179,7 +184,10 @@ def gernerate_vdm(vdm_mode, session, orig_data, b0_index):
 
     logits = predict(session, image)
 
-    df_map = resample_to_new_resolution(nib.Nifti1Image(logits[0, 0, ...], resample_nii.affine), target_resolution=zoom, target_shape=vol.shape, interpolation='linear').get_fdata() / 1.75 * zoom[1]
+    if resample:
+        df_map = resample_to_new_resolution(nib.Nifti1Image(logits[0, 0, ...], resample_nii.affine), target_resolution=zoom, target_shape=vol.shape, interpolation='linear').get_fdata() / 1.7 * zoom[1]
+    else:
+        df_map = logits[0, 0, ...]
 
     df_map_f = np.array(df_map*0, dtype='float64')
     for nslice in np.arange(df_map.shape[2]):

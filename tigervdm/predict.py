@@ -18,6 +18,7 @@ parser.add_argument('input',  type=str, nargs='+', help='Path to the input image
 parser.add_argument('-o', '--output', default=None, help='File path for output image, default: the directory of input files')
 parser.add_argument('-b0', '--b0_index', default=None, type=str, help='The index of b0 slice or the .bval file, default: 0 (the first slice)')
 parser.add_argument('-m', '--dmap', action='store_true', help='Producing the virtual displacement map')
+parser.add_argument('-r', '--resample', default=True, help='Resample to 1.7, default: True')
 parser.add_argument('-g', '--gpu', action='store_true', help='Using GPU')
 
 args = parser.parse_args() 
@@ -69,9 +70,12 @@ for f in tqdm.tqdm(ffs):
         
     vol[vol<0] = 0
     
-    resample_nii = resample_to_new_resolution(nib.Nifti1Image(vol, affine), target_resolution=(1.75, 1.75, 1.75), target_shape=None, interpolation='continuous')
-    vol_resize = resample_nii.get_fdata()
-    vol_resize = vol_resize / np.max(vol_resize)
+    if args.resample:
+        resample_nii = resample_to_new_resolution(nib.Nifti1Image(vol, affine), target_resolution=(1.7, 1.7, 1.7), target_shape=None, interpolation='continuous')
+        vol_resize = resample_nii.get_fdata()
+        vol_resize = vol_resize / np.max(vol_resize)
+    else:
+        vol_resize = vol / np.max(vol)
     
     vol_d = torch.from_numpy(vol_resize).to(device).float()   
     logits = NET(vol_d[None, ...][None, ...])
@@ -79,7 +83,10 @@ for f in tqdm.tqdm(ffs):
     df_map_org = logits[0,0, ...].cpu().detach().numpy()
     
     
-    df_map = resample_to_new_resolution(nib.Nifti1Image(df_map_org, resample_nii.affine), target_resolution=zoom, target_shape=vol.shape, interpolation='linear').get_fdata() / 1.75 * zoom[1]
+    if args.resample:
+        df_map = resample_to_new_resolution(nib.Nifti1Image(df_map_org, resample_nii.affine), target_resolution=zoom, target_shape=vol.shape, interpolation='linear').get_fdata() / 1.7 * zoom[1]
+    else:
+        df_map = df_map_org
     
     df_map_f = np.array(df_map*0, dtype='float64')
     for nslice in np.arange(vol.shape[2]):

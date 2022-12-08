@@ -4,7 +4,7 @@
 import os
 import re
 import subprocess
-import onnxruntime as ort
+# import onnxruntime as ort
 import shutil
 import warnings
 from os.path import join, isdir, basename, isfile, dirname
@@ -21,7 +21,7 @@ model_servers = ['https://github.com/htylab/tigervdm/releases/download/modelhub/
                     'https://data.mrilab.org/onnxmodel/dev/']
 
 # determine if application is a script file or frozen exe
-if getattr(sys, 'frozen', False):
+if getattr(sys, 'frozen', False) and 0:
     application_path = os.path.dirname(sys.executable)
 elif __file__:
     application_path = os.path.dirname(os.path.abspath(__file__))
@@ -225,6 +225,8 @@ def predict(model, data, GPU):
     #from .tool import cpu_count
     #will reload model file every time
 
+    import onnxruntime as ort
+    
     so = ort.SessionOptions()
     cpu = max(int(cpu_count()*0.8), 1)
     so.intra_op_num_threads = cpu
