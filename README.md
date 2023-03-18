@@ -4,7 +4,7 @@ Kuo CC, Huang TY, Lin YR, Chuang TC, Tsai SY, Chung HW, “Referenceless correct
 
 
 * This repo is the version of the paper and only for Pytorch or a stand-alone exe.
-* For updated version, please visit: https://github.com/htylab/tigervdm
+* For updated version, please visit: https://github.com/htylab/tigerepi
 
 # The VDM pipeline for DTI distortion correction 
 
