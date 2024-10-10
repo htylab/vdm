@@ -35,10 +35,10 @@ def run(model_ff, input_data, b0_index, GPU, resample=True):
                                        providers=['CPUExecutionProvider'],
                                        sess_options=so)
 
-    vdm_mode, _, _ = get_mode(model_ff) #vdmmode: 3dunet, gan    
+    vdm_mode, _, model_type = get_mode(model_ff) #vdmmode: 3dunet, gan    
+    AP_RL = 'RL' if 'hcp' in model_type else 'AP'
 
     orig_data = input_data  
-    
     
     vdm_pred = gernerate_vdm(vdm_mode, session, orig_data, b0_index, resample=resample)
 
@@ -47,11 +47,11 @@ def run(model_ff, input_data, b0_index, GPU, resample=True):
     if len(orig_data.shape)==4:
         
         for bslice in range(orig_data.shape[3]):
-            output_vol[...,bslice] = apply_vdm_3d(orig_data3d[...,bslice], vdm_pred, AP_RL='AP')
+            output_vol[...,bslice] = apply_vdm_3d(orig_data3d[...,bslice], vdm_pred, AP_RL=AP_RL)
             
     else:
         
-        output_vol = apply_vdm_3d(orig_data3d, vdm_pred, AP_RL='AP')
+        output_vol = apply_vdm_3d(orig_data3d, vdm_pred, AP_RL=AP_RL)
 
     
 

@@ -23,6 +23,7 @@ def main():
     parser.add_argument('-n', '--no_resample', action='store_true', help='Don\'t resample to 1.7x1.7x1.7mm3')
     parser.add_argument('-m', '--dmap', action='store_true', help='Producing the virtual displacement map')
     parser.add_argument('-g', '--gpu', action='store_true', help='Using GPU')
+    parser.add_argument('-model', '--model', default='vdm_gan_v001_fold0', type=str, help='Select specific model')
 
     args = parser.parse_args() 
 
@@ -47,8 +48,8 @@ def main():
 
     print('Total nii files:', len(input_file_list))
 
-
-    model_name = tigertool.get_model('vdm_gan_v001_fold0')
+    
+    model_name = tigertool.get_model(args.model)
 
 
 
