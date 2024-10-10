@@ -1,1 +1,1 @@
-train.py 0 4 1 200 8
+python train.py 0 4 1 200 8
