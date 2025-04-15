@@ -6,17 +6,17 @@ Kuo CC, Huang TY, Lin YR, Chuang TC, Tsai SY, Chung HW, “Referenceless correct
 * This repo is the version of the paper and only for Pytorch or a stand-alone exe.
 * For updated version, please visit: https://github.com/htylab/tigerepi
 
-# The VDM pipeline for DTI distortion correction 
+# The GDM pipeline for DTI distortion correction 
 
 ## Background
-This package provides VDM distortion correction method for diffusion tensor images
+This package provides GDM distortion correction method for diffusion tensor images
 
 
-## Tutorial using VDM for EPI Distortion Correction
+## Tutorial using GDM for EPI Distortion Correction
 
 ### Download package
 
-    https://github.com/htylab/vdm/releases/main.zip 
+    https://github.com/htylab/gdm/releases/main.zip 
 
 ## Usage
 
@@ -24,8 +24,8 @@ This package provides VDM distortion correction method for diffusion tensor imag
 
 - Clone this repository:
 ```bash
-git clone https://github.com/htylab/vdm
-cd ./vdm/vdm
+git clone https://github.com/htylab/gdm
+cd ./gdm/gdm
 ```
 - Run the predict code:
 ```
@@ -43,20 +43,20 @@ python predict.py -h
 ### Exe module:
 - Windows:
 ```bash
-.\vdm.exe INPUT -o OUTPUT
+.\gdm.exe INPUT -o OUTPUT
 ```
 
 For additional options type:
 ```bash
-.\vdm.exe -h
+.\gdm.exe -h
 ```
 
 - Linux or Mac:
 ```bash
-./vdm INPUT -o OUTPUT
+./gdm INPUT -o OUTPUT
 ```
 
 For additional options type:
 ```bash
-./vdm -h
+./gdm -h
 ```

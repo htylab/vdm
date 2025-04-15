@@ -9,7 +9,7 @@ import nibabel as nib
 import numpy as np
 import time
 
-import lib_vdm as vdm
+import lib_gdm as gdm
 import lib_tool as tigertool
 
 
@@ -23,7 +23,7 @@ def main():
     parser.add_argument('-n', '--no_resample', action='store_true', help='Don\'t resample to 1.7x1.7x1.7mm3')
     parser.add_argument('-m', '--dmap', action='store_true', help='Producing the virtual displacement map')
     parser.add_argument('-g', '--gpu', action='store_true', help='Using GPU')
-    parser.add_argument('-model', '--model', default='vdm_gan_v001_fold0', type=str, help='Select specific model')
+    parser.add_argument('-model', '--model', default='gdm_gan_v001_fold0', type=str, help='Select specific model')
 
     args = parser.parse_args() 
 
@@ -40,7 +40,7 @@ def main():
     if args.b0_index is None:
         b0_index = 0
     elif os.path.exists(args.b0_index.replace('.bval', '') + '.bval'):
-        b0_index = vdm.get_b0_slice(args.b0_index.replace('.bval', '') + '.bval')
+        b0_index = gdm.get_b0_slice(args.b0_index.replace('.bval', '') + '.bval')
     else:
         b0_index = int(args.b0_index)
         
@@ -57,8 +57,8 @@ def main():
 
         print('Predicting:', f)
         t = time.time()
-        input_data = vdm.read_file(model_name, f)
-        vdmi, vdmap = vdm.run(model_name, input_data, b0_index, GPU=args.gpu, resample=resample)
+        input_data = gdm.read_file(model_name, f)
+        gdmi, gdmap = gdm.run(model_name, input_data, b0_index, GPU=args.gpu, resample=resample)
         
         if output_dir is None:
             f_output_dir = os.path.dirname(os.path.abspath(f))
@@ -66,10 +66,10 @@ def main():
             f_output_dir = output_dir
             os.makedirs(output_dir, exist_ok=True)
         
-        vdm.write_file(model_name, f, f_output_dir, vdmi)
+        gdm.write_file(model_name, f, f_output_dir, gdmi)
         
         if args.dmap:
-            vdm.write_file(model_name, f, f_output_dir, vdmap, postfix='vdm')
+            gdm.write_file(model_name, f, f_output_dir, gdmap, postfix='gdm')
 
         print('Processing time: %d seconds' % (time.time() - t))    
 

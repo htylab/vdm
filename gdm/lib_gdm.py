@@ -35,34 +35,34 @@ def run(model_ff, input_data, b0_index, GPU, resample=True):
                                        providers=['CPUExecutionProvider'],
                                        sess_options=so)
 
-    vdm_mode, _, model_type = get_mode(model_ff) #vdmmode: 3dunet, gan    
+    gdm_mode, _, model_type = get_mode(model_ff) #gdmmode: 3dunet, gan    
     AP_RL = 'RL' if 'hcp' in model_type else 'AP'
 
     orig_data = input_data  
     
-    vdm_pred = gernerate_vdm(vdm_mode, session, orig_data, b0_index, resample=resample)
+    gdm_pred = gernerate_gdm(gdm_mode, session, orig_data, b0_index, resample=resample)
 
     output_vol = np.zeros(orig_data.shape)
     orig_data3d = orig_data.get_fdata()
     if len(orig_data.shape)==4:
         
         for bslice in range(orig_data.shape[3]):
-            output_vol[...,bslice] = apply_vdm_3d(orig_data3d[...,bslice], vdm_pred, AP_RL=AP_RL)
+            output_vol[...,bslice] = apply_gdm_3d(orig_data3d[...,bslice], gdm_pred, AP_RL=AP_RL)
             
     else:
         
-        output_vol = apply_vdm_3d(orig_data3d, vdm_pred, AP_RL=AP_RL)
+        output_vol = apply_gdm_3d(orig_data3d, gdm_pred, AP_RL=AP_RL)
 
     
 
-    return output_vol, vdm_pred
+    return output_vol, gdm_pred
 
 
 def read_file(model_ff, input_file):
     return nib.load(input_file)
 
 
-def write_file(model_ff, input_file, output_dir, vol_out, inmem=False, postfix='vdmi'):
+def write_file(model_ff, input_file, output_dir, vol_out, inmem=False, postfix='gdmi'):
 
     if not isdir(output_dir):
         print('Output dir does not exist.')
@@ -78,7 +78,7 @@ def write_file(model_ff, input_file, output_dir, vol_out, inmem=False, postfix='
     zoom = input_nib.header.get_zooms()
     
 
-    if postfix=='vdm':
+    if postfix=='gdm':
         result = nib.Nifti1Image(vol_out, affine)
     else:
         result = nib.Nifti1Image(vol_out.astype(input_nib.get_data_dtype()), affine)
@@ -118,12 +118,12 @@ def resample_to_new_resolution(data_nii, target_resolution, target_shape=None, i
     return new_nii
 
 
-def apply_vdm_2d(ima, vdm, readout=1, AP_RL='AP'):
+def apply_gdm_2d(ima, gdm, readout=1, AP_RL='AP'):
 
     if AP_RL == 'AP':
-        arr = np.stack([vdm*readout, vdm*0], axis=-1)
+        arr = np.stack([gdm*readout, gdm*0], axis=-1)
     else:
-        arr = np.stack([vdm*0, vdm*readout], axis=-1)
+        arr = np.stack([gdm*0, gdm*readout], axis=-1)
     displacement_image = sitk.GetImageFromArray(arr, isVector=True)
 
     jac = sitk.DisplacementFieldJacobianDeterminant(displacement_image)
@@ -141,12 +141,12 @@ def apply_vdm_2d(ima, vdm, readout=1, AP_RL='AP'):
     return new_ima*jac_np
 
 
-def apply_vdm_3d(ima, vdm, readout=1, AP_RL='AP'):
+def apply_gdm_3d(ima, gdm, readout=1, AP_RL='AP'):
 
     if AP_RL == 'AP':
-        arr = np.stack([vdm*0, vdm*readout, vdm*0], axis=-1)
+        arr = np.stack([gdm*0, gdm*readout, gdm*0], axis=-1)
     else:
-        arr = np.stack([vdm*0, vdm*0, vdm*readout], axis=-1)
+        arr = np.stack([gdm*0, gdm*0, gdm*readout], axis=-1)
     displacement_image = sitk.GetImageFromArray(arr, isVector=True)
 
     jac = sitk.DisplacementFieldJacobianDeterminant(displacement_image)
@@ -165,7 +165,7 @@ def apply_vdm_3d(ima, vdm, readout=1, AP_RL='AP'):
 
 
 
-def gernerate_vdm(vdm_mode, session, orig_data, b0_index, resample=True):
+def gernerate_gdm(gdm_mode, session, orig_data, b0_index, resample=True):
 
     zoom = orig_data.header.get_zooms()[0:3]
     if len(orig_data.shape)>3:
@@ -196,8 +196,8 @@ def gernerate_vdm(vdm_mode, session, orig_data, b0_index, resample=True):
     for nslice in np.arange(df_map.shape[2]):
         df_map_slice = gaussian_filter(df_map[..., nslice], sigma=1.5).astype('float64')
         df_map_f[..., nslice] = df_map_slice
-    vdm_pred = df_map_f
+    gdm_pred = df_map_f
 
     
 
-    return vdm_pred
+    return gdm_pred

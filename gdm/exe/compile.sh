@@ -1,0 +1,1 @@
+pyinstaller -c --icon=ico.ico --add-data libonnxruntime_providers_shared.so:onnxruntime/capi --add-data ../lib_tool.py:./ --add-data ../lib_gdm.py:./ --add-data gdm_gan_v001_fold0.onnx:./models -F ../gdm.py

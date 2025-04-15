@@ -9,7 +9,7 @@ import torch
 from UNet3d import UNet3d
 from scipy.ndimage import gaussian_filter
 from lib_tool import *
-from lib_vdm import *
+from lib_gdm import *
 import warnings
 warnings.filterwarnings("ignore")
 
@@ -46,8 +46,8 @@ resample = (not args.no_resample)
 
 model_path = './models'
 os.makedirs(model_path, exist_ok=True)
-model_file = os.path.join(model_path,'vdm_model_v1.pt')
-model_url = 'https://github.com/htylab/vdm/releases/download/modelhub/vdm_model_v1.pt'
+model_file = os.path.join(model_path,'gdm_model_v1.pt')
+model_url = 'https://github.com/htylab/gdm/releases/download/modelhub/gdm_model_v1.pt'
 if not os.path.exists(model_file):
     print(f'Downloading model files....')
     print(model_url, model_file)
@@ -98,9 +98,9 @@ for f in tqdm.tqdm(ffs):
     vol_out = vol_org*0
     if len(vol_org.shape)==4:
         for bslice in range(vol_org.shape[3]):
-            vol_out[...,bslice] = apply_vdm_3d(vol_org[...,bslice], df_map_f, AP_RL='AP')
+            vol_out[...,bslice] = apply_gdm_3d(vol_org[...,bslice], df_map_f, AP_RL='AP')
     else:
-        vol_out = apply_vdm_3d(vol_org, df_map_f, AP_RL='AP')
+        vol_out = apply_gdm_3d(vol_org, df_map_f, AP_RL='AP')
 
     
     if output_dir is None:
@@ -110,11 +110,11 @@ for f in tqdm.tqdm(ffs):
         os.makedirs(output_dir, exist_ok=True)
     
     result = nib.Nifti1Image(vol_out.astype(temp.get_data_dtype()), affine)
-    fn = os.path.basename(f).replace('.nii.gz', '_vdmi.nii.gz')
+    fn = os.path.basename(f).replace('.nii.gz', '_gdmi.nii.gz')
     nib.save(result, os.path.join(result_dir, fn))
     
     if args.dmap:
         result = nib.Nifti1Image(df_map_f, affine)
         result.header.set_zooms(zoom)
-        fn = os.path.basename(f).replace('.nii.gz', '_vdm.nii.gz')
+        fn = os.path.basename(f).replace('.nii.gz', '_gdm.nii.gz')
         nib.save(result, os.path.join(result_dir, fn))

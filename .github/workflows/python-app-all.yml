@@ -22,7 +22,7 @@ jobs:
       matrix:
         os: ['windows-latest', 'ubuntu-20.04', 'macos-latest']
         # os: ['windows-latest']
-        py: ['vdm']
+        py: ['gdm']
 
     steps:
     - uses: actions/checkout@v3
@@ -37,15 +37,15 @@ jobs:
     - name: Run Pyinstaller 1
       if: matrix.os == 'windows-latest'
       run: |
-        pyinstaller -c -p ./vdm --icon=./vdm/exe/ico.ico --add-data "./vdm/exe/onnxruntime_providers_shared.dll;onnxruntime/capi" --add-data "./vdm/lib_tool.py;./" --add-data "./vdm/lib_vdm.py;./" -F ./vdm/${{ matrix.py }}.py
+        pyinstaller -c -p ./gdm --icon=./gdm/exe/ico.ico --add-data "./gdm/exe/onnxruntime_providers_shared.dll;onnxruntime/capi" --add-data "./gdm/lib_tool.py;./" --add-data "./gdm/lib_gdm.py;./" -F ./gdm/${{ matrix.py }}.py
     - name: Run Pyinstaller  2
       if: matrix.os == 'ubuntu-20.04'
       run: |
-        pyinstaller -c -p ./vdm --icon=./vdm/exe/ico.ico --add-data ./vdm/exe/libonnxruntime_providers_shared.so:onnxruntime/capi --add-data ./vdm/lib_tool.py:./ --add-data ./vdm/lib_vdm.py:./ -F ./vdm/${{ matrix.py }}.py
+        pyinstaller -c -p ./gdm --icon=./gdm/exe/ico.ico --add-data ./gdm/exe/libonnxruntime_providers_shared.so:onnxruntime/capi --add-data ./gdm/lib_tool.py:./ --add-data ./gdm/lib_gdm.py:./ -F ./gdm/${{ matrix.py }}.py
     - name: Run Pyinstaller 3
       if: matrix.os == 'macos-latest'
       run: |
-        pyinstaller -c -p ./vdm --icon=./vdm/exe/ico.ico --add-data ./vdm/exe/libonnxruntime_providers_shared.so:onnxruntime/capi --add-data ./vdm/lib_tool.py:./ --add-data ./vdm/lib_vdm.py:./ -F ./vdm/${{ matrix.py }}.py
+        pyinstaller -c -p ./gdm --icon=./gdm/exe/ico.ico --add-data ./gdm/exe/libonnxruntime_providers_shared.so:onnxruntime/capi --add-data ./gdm/lib_tool.py:./ --add-data ./gdm/lib_gdm.py:./ -F ./gdm/${{ matrix.py }}.py
 
         
     - uses: actions/upload-artifact@v3

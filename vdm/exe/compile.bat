@@ -1,1 +1,0 @@
-pyinstaller -c --icon=ico.ico --add-data onnxruntime_providers_shared.dll;onnxruntime\capi --add-data ..\lib_tool.py;.\ --add-data ..\lib_vdm.py;.\ --add-data vdm_gan_v001_fold0.onnx;.\models -F ..\vdm.py
