@@ -1,6 +1,6 @@
-# Virtual Displacement Mapping
+# Generative Displacement Mapping
 #### This repo is for the methods described in the paper.
-Kuo CC, Huang TY, Lin YR, Chuang TC, Tsai SY, Chung HW, “Referenceless correction of EPI distortion with virtual displacement mapping” (2023), 
+Kuo CC, Huang TY, Lin YR, Chuang TC, Tsai SY, Chung HW, “Referenceless reduction of spin-echo EPI distortion with generative displacement mapping” (2025), 
 
 
 * This repo is the version of the paper and only for Pytorch or a stand-alone exe.
